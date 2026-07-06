@@ -1,0 +1,52 @@
+name: Auto Merge PR
+
+on:
+    pull_request:
+        branches:
+            - main
+        types:
+            - opened
+            - synchronize
+            - reopened
+            - ready_for_review
+
+permissions:
+    contents: write
+    pull-requests: write
+    checks: read
+    statuses: read
+
+jobs:
+    test:
+        if: github.event.pull_request.head.ref == 'test'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 22
+                cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run tests
+              run: npm test
+            
+            - name: Build site
+              run: npm run build
+
+    auto-merge:
+        if: github.event.pull_request.head.ref == 'test'
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Enable auto-merge
+              run: gh pr merge "$PR_URL" --merge --auto
+              env:
+                GH_TOKEN: ${{ github.token}}
+                PR_URL: ${{ github.event.pull_request.html_url }}

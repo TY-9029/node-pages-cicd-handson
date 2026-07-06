@@ -1,0 +1,16 @@
+{
+  "name": "node-pages-cicd-handson",
+  "version": "1.0.0",
+  "description": "Hands-on",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node src/site.js",
+    "test": "node --test",
+    "start": "npm serve dist"
+  },
+  "devDependencies": {
+    "serve": "^14.2.6"
+  },
+  "license": "MIT"
+}
